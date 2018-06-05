@@ -12,6 +12,13 @@ var ctx = canvas.getContext("2d");
 canvas.width = 500,
 canvas.height = 900;
 var keys = [];
+var wallLeft = {x: 150, y: 10};
+var wallStackLeft = [];
+wallStackLeft.push(wallLeft);
+
+var wallRight = {x: 350, y: 10};
+var wallStackRight = [];
+wallStackRight.push(wallRight);
 
 class Player{
   constructor(posX, posY, size){
@@ -68,7 +75,8 @@ Player.prototype.draw = function(){
 var player = new Player(canvas.width/2, canvas.height-SIZE-50, SIZE);
 console.log(player);
 player.draw();
-
+drawPixels(wallStackLeft[0].x, wallStackLeft[0].y)
+drawPixels(wallStackRight[0].x, wallStackRight[0].y)
 function update(){
   // check keys
     if (keys[32]) {
@@ -92,7 +100,29 @@ function update(){
     player.posY += player.dy;
 
     ctx.clearRect(0, 0,this.canvas.width, this.canvas.height);
-    player.draw()
+    player.draw();
+    var left = updateLeftStack(wallStackLeft);
+    var right = updateRightStack(wallStackRight);
+    if ((right.x - left.x) <= 100){
+      while ((right.x - left.x) <= 100) {
+        right.x ++;
+        left.x --;
+      }// what about check to see about the edge cases, its handled in the update method
+    }
+    wallStackLeft.unshift(left);
+    wallStackRight.unshift(right);
+    for (var i = 0; i < wallStackLeft.length; i++) {
+      wallStackLeft[i].y += 10
+      drawPixels(wallStackLeft[i].x, wallStackLeft[i].y)
+    }
+    if(wallStackLeft[wallStackLeft.length - 1].y > canvas.height) wallStackLeft.pop();
+
+    for (var i = 0; i < wallStackRight.length; i++) {
+      wallStackRight[i].y += 10
+      drawPixels(wallStackRight[i].x, wallStackRight[i].y)
+    }
+    if(wallStackRight[wallStackRight.length - 1].y > canvas.height) wallStackRight.pop();
+
   requestAnimationFrame(update);
 }
 
@@ -108,8 +138,25 @@ window.addEventListener("load",function(){
     update();
 });
 
-function createGame(){
-  // canvas = createCanvas(canvasWidth,canvasHeight);
 
+function drawPixels(x, y) {
+  for (var i = -10; i < 10; i+= 4) {
+    for (var j = -10; j < 10; j+= 4) {
+      // if (Math.random() > 0.5)
+        ctx.fillStyle = ['black', 'black', 'purple'][getRandom(0,2)];
+        ctx.fillRect(x+i, y+j, 4, 4);
 
+    }
+  }
+}
+
+function getRandom(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function overlap(actor1, actor2) {
+  return actor1.pos.x + actor1.size.x > actor2.pos.x &&
+         actor1.pos.x < actor2.pos.x + actor2.size.x &&
+         actor1.pos.y + actor1.size.y > actor2.pos.y &&
+         actor1.pos.y < actor2.pos.y + actor2.size.y;
 }
