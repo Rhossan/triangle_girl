@@ -6,6 +6,7 @@
 var canvasWidth = 500;
 var canvasHeight = 1000;
 var SIZE = 20;
+var gameEnd = false;
 
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
@@ -28,6 +29,8 @@ class Player{
     this.dx = 0;
     this.dy = 0;
     this.speed = 10;
+    this.firstVertex = 0;
+    this.secondVertex = 0;
   }
 }
 
@@ -37,15 +40,21 @@ Player.prototype.draw = function(){
 
   ctx.beginPath();
   ctx.moveTo(this.posX,this.posY);
-  firstVertex = [this.posX - (this.size/2), this.posY + heightTriangle];
-  ctx.lineTo(firstVertex[0], firstVertex[1]);
+  this.firstVertex = [this.posX - (this.size/2), this.posY + heightTriangle];
+  ctx.lineTo(this.firstVertex[0], this.firstVertex[1]);
   ctx.stroke();
-  secondVertex = [this.posX + (this.size/2), this.posY + heightTriangle];
-  ctx.lineTo(secondVertex[0], secondVertex[1]);
+  this.secondVertex = [this.posX + (this.size/2), this.posY + heightTriangle];
+  ctx.lineTo(this.secondVertex[0], this.secondVertex[1]);
   ctx.stroke();
   ctx.lineTo(this.posX, this.posY);
   ctx.stroke();
   ctx.fill();
+  // var data = ctx.getImageData(firstVertex[0], firstVertex[1], 1, 1).data;
+  // if (data[0] === 0 && data[1] === 0 && data[2] === 0){
+  //   console.log("end-game");
+  // }
+  // var rgba = 'rgba(' + data[0] + ', ' + data[1] +
+  //            ', ' + data[2] + ', ' + (data[3] / 255) + ')';
   // beginShape();
   // vertex(this.xPos, this.yPos);
   // vertex(this.xPos - (this.size/2), this.yPos + heightTriangle);
@@ -77,7 +86,13 @@ console.log(player);
 player.draw();
 drawPixels(wallStackLeft[0].x, wallStackLeft[0].y)
 drawPixels(wallStackRight[0].x, wallStackRight[0].y)
+
+
 function update(){
+  // if (gameEnd == true){
+  //   console.log("game donezo");
+  //   return;
+  // }
   // check keys
     if (keys[32]) {
         // space
@@ -101,6 +116,7 @@ function update(){
 
     ctx.clearRect(0, 0,this.canvas.width, this.canvas.height);
     player.draw();
+
     var left = updateLeftStack(wallStackLeft);
     var right = updateRightStack(wallStackRight);
     if ((right.x - left.x) <= 100){
@@ -123,6 +139,9 @@ function update(){
     }
     if(wallStackRight[wallStackRight.length - 1].y > canvas.height) wallStackRight.pop();
 
+
+
+  collision();
   requestAnimationFrame(update);
 }
 
@@ -154,9 +173,26 @@ function getRandom(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function overlap(actor1, actor2) {
-  return actor1.pos.x + actor1.size.x > actor2.pos.x &&
-         actor1.pos.x < actor2.pos.x + actor2.size.x &&
-         actor1.pos.y + actor1.size.y > actor2.pos.y &&
-         actor1.pos.y < actor2.pos.y + actor2.size.y;
+function collision() {
+  var data = ctx.getImageData(player.firstVertex[0], player.firstVertex[1], 1, 1).data;
+  if (data[0] === 0 && data[1] === 0 && data[2] === 0 && 1 === (data[3] / 255)){
+    console.log("end-game");
+    gameEnd = true;
+  }
+  data = ctx.getImageData(player.firstVertex[0], player.firstVertex[1], 1, 1).data;
+  if (data[0] === 0 && data[1] === 0 && data[2] === 0 && 1 === (data[3] / 255)){
+    console.log("end-game1");
+    gameEnd = true;
+  }
+
+  var data = ctx.getImageData(player.firstVertex[0], player.firstVertex[1], 1, 1).data;
+  if (data[0] === 128 && data[1] === 0 && data[2] === 128 && 1 === (data[3] / 255)){
+    console.log("end-game2");
+    gameEnd = true;
+  }
+  data = ctx.getImageData(player.firstVertex[0], player.firstVertex[1], 1, 1).data;
+  if (data[0] === 128 && data[1] === 0 && data[2] === 128 && 1 === (data[3] / 255)){
+    console.log("end-game3");
+    gameEnd = true;
+  }
 }
