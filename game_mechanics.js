@@ -9,6 +9,7 @@ var SIZE = 20;
 var gameEnd = false;
 var score = 0;
 var lives = 3;
+var restartBool = false;
 
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
@@ -98,13 +99,14 @@ drawPixels(wallStackRight[0].x, wallStackRight[0].y)
 function update(){
   if (gameEnd == true){
     console.log("game donezo");
+    restartGame();
     return;
   }
 
 
   // check keys
-    if (keys[32]) {
-        // space
+    if (keys[13]) {
+        restartBool = false;
     }
     if (keys[39]) {
         // right arrow
@@ -158,7 +160,12 @@ function update(){
 
 
   collision();
-  requestAnimationFrame(update);
+  if (restartBool === false){
+    requestAnimationFrame(update);
+  }
+  else{
+    update();
+  }
 }
 
 document.body.addEventListener("keydown", function(e) {
@@ -249,5 +256,17 @@ function collision() {
 }
 
 function restartGame(){
-
+  ctx.clearRect(0, 0,this.canvas.width, this.canvas.height);
+  ctx.font = "20px Arial";
+  ctx.fillStyle = "yellow";
+  ctx.fillText("Score: " + score, 50, 250);
+  ctx.fillText("Simply Press ctrl-R To Retry, I Believe In You! ", 50, 300);
+  restartBool = true;
 }
+
+// document.bodyaddEventListener("keyup", function(event) {
+//     event.preventDefault();
+//     if (event.keyCode === 13) {
+//         update();
+//     }
+// });
