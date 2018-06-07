@@ -4,14 +4,16 @@
 })();
 
 var canvasWidth = 500;
-var canvasHeight = 1000;
+var canvasHeight = 500;
 var SIZE = 20;
 var gameEnd = false;
+var score = 0;
+var lives = 3;
 
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
-canvas.width = 500,
-canvas.height = 900;
+canvas.width = canvasWidth,
+canvas.height = canvasHeight;
 var keys = [];
 var wallLeft = {x: 150, y: 10};
 var wallStackLeft = [];
@@ -20,6 +22,7 @@ wallStackLeft.push(wallLeft);
 var wallRight = {x: 350, y: 10};
 var wallStackRight = [];
 wallStackRight.push(wallRight);
+
 
 class Player{
   constructor(posX, posY, size){
@@ -82,17 +85,23 @@ Player.prototype.draw = function(){
     // ctx.fillStyle = 'yellow';
     // ctx.fill();
 var player = new Player(canvas.width/2, canvas.height-SIZE-50, SIZE);
+var playerLives = [new Player(10, 10, SIZE), new Player(10, 50, SIZE), new Player(10, 90, SIZE)]
 console.log(player);
 player.draw();
+for (var i = 0; i < playerLives.length; i++) {
+  playerLives[i].draw();
+}
 drawPixels(wallStackLeft[0].x, wallStackLeft[0].y)
 drawPixels(wallStackRight[0].x, wallStackRight[0].y)
 
 
 function update(){
-  // if (gameEnd == true){
-  //   console.log("game donezo");
-  //   return;
-  // }
+  if (gameEnd == true){
+    console.log("game donezo");
+    return;
+  }
+
+
   // check keys
     if (keys[32]) {
         // space
@@ -115,7 +124,11 @@ function update(){
     player.posY += player.dy;
 
     ctx.clearRect(0, 0,this.canvas.width, this.canvas.height);
+
     player.draw();
+    for (var i = 0; i < playerLives.length; i++) {
+      playerLives[i].draw();
+    }
 
     var left = updateLeftStack(wallStackLeft);
     var right = updateRightStack(wallStackRight);
@@ -138,7 +151,10 @@ function update(){
       drawPixels(wallStackRight[i].x, wallStackRight[i].y)
     }
     if(wallStackRight[wallStackRight.length - 1].y > canvas.height) wallStackRight.pop();
-
+    score+=5;
+    ctx.font = "30px Arial";
+    ctx.fillStyle = "yellow";
+    ctx.fillText("Score: " + score, 300, 25);
 
 
   collision();
@@ -177,22 +193,61 @@ function collision() {
   var data = ctx.getImageData(player.firstVertex[0], player.firstVertex[1], 1, 1).data;
   if (data[0] === 0 && data[1] === 0 && data[2] === 0 && 1 === (data[3] / 255)){
     console.log("end-game");
-    gameEnd = true;
+    playerLives.pop();
+    if(!playerLives.length) {
+      gameEnd = true;
+      return;
+    }
+    else {
+      var diff = wallStackRight[wallStackRight.length-1].x - wallStackLeft[wallStackLeft.length-1].x;
+      player.posX = (diff/2) + wallStackLeft[wallStackLeft.length-1].x;
+      return;
+    }
   }
   data = ctx.getImageData(player.firstVertex[0], player.firstVertex[1], 1, 1).data;
   if (data[0] === 0 && data[1] === 0 && data[2] === 0 && 1 === (data[3] / 255)){
     console.log("end-game1");
-    gameEnd = true;
+    playerLives.pop();
+    if(!playerLives.length) {
+      gameEnd = true;
+      return;
+    }
+    else {
+      var diff = wallStackRight[wallStackRight.length-1].x - wallStackLeft[wallStackLeft.length-1].x;
+      player.posX = (diff/2) + wallStackLeft[wallStackLeft.length-1].x;
+      return;
+    }
   }
 
   var data = ctx.getImageData(player.firstVertex[0], player.firstVertex[1], 1, 1).data;
   if (data[0] === 128 && data[1] === 0 && data[2] === 128 && 1 === (data[3] / 255)){
     console.log("end-game2");
-    gameEnd = true;
+    playerLives.pop();
+    if(!playerLives.length) {
+      gameEnd = true;
+      return;
+    }
+    else {
+      var diff = wallStackRight[wallStackRight.length-1].x - wallStackLeft[wallStackLeft.length-1].x;
+      player.posX = (diff/2) + wallStackLeft[wallStackLeft.length-1].x;
+      return;
+    }
   }
   data = ctx.getImageData(player.firstVertex[0], player.firstVertex[1], 1, 1).data;
   if (data[0] === 128 && data[1] === 0 && data[2] === 128 && 1 === (data[3] / 255)){
     console.log("end-game3");
-    gameEnd = true;
+    playerLives.pop();
+    if(!playerLives.length) {
+      gameEnd = true;
+    }
+    else {
+      var diff = wallStackRight[wallStackRight.length-1].x - wallStackLeft[wallStackLeft.length-1].x;
+      player.posX = (diff/2) + wallStackLeft[wallStackLeft.length-1].x;
+      return;
+    }
   }
+}
+
+function restartGame(){
+
 }

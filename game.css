@@ -1,1 +1,16 @@
-#myCanvas {background: #eee; display: block; margin: 0 auto;}
+#myCanvas {background: #3d352d; display: block; margin: 0 auto;}
+.group{display: inline-block;}
+.left {display: inline-block; float: left;}
+.right {display: inline-block; float: right;}
+.main_header{
+  background-color: #5c1919;
+  text-align: center;
+  border-bottom: 3px solid #FFF;
+  overflow: hidden;
+  min-width: 780px;
+  max-height: 200px;
+  color: white;
+}
+.body{
+  background-color: black;
+}
